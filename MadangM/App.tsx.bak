@@ -1,0 +1,106 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  Linking, 
+  Alert, 
+  ActivityIndicator, 
+  StatusBar,
+  ScrollView 
+} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
+function App() {
+  const [productId, setProductId] = useState<string | null>(null);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 백엔드 주소 (실제 기기 연결 시 adb reverse tcp:3000 tcp:3000 실행 필수)
+  const SERVER_URL = 'http://localhost:3000'; 
+
+  // URL에서 상품 ID를 찾아내는 로직
+  const handleUrl = (url: string | null) => {
+    if (!url) return;
+    console.log("태그된 URL:", url);
+    
+    // 주소에서 ?id= 뒤의 값을 가져옴
+    const regex = /[?&]id=([^&#]*)/;
+    const match = url.match(regex);
+    if (match && match[1]) {
+      const id = match[1];
+      setProductId(id);
+      fetchProductData(id);
+    }
+  };
+
+  // 서버에서 데이터 가져오기
+  const fetchProductData = async (id: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${SERVER_URL}/products/${id}`);
+      const data = await response.json();
+      setProduct(data);
+    } catch (error) {
+      Alert.alert("오류", "서버에서 데이터를 가져오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // 앱이 꺼져있을 때 URL로 켜진 경우
+    Linking.getInitialURL().then(handleUrl);
+    // 앱이 켜져있을 때 URL 이벤트가 발생한 경우
+    const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
+    return () => subscription.remove();
+  }, []);
+
+  return (
+    <SafeAreaProvider>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Consumer Shopping App</Text>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.content}>
+          {!productId ? (
+            <View style={styles.emptyView}>
+              <Text style={styles.infoText}>📱 상품 태그를 스캔해 주세요.</Text>
+            </View>
+          ) : loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : product ? (
+            <View style={styles.productCard}>
+              <Text style={styles.label}>인식된 상품</Text>
+              <Text style={styles.name}>{product.name}</Text>
+              <Text style={styles.price}>{product.price}원</Text>
+              <View style={styles.line} />
+              <Text style={styles.desc}>{product.description || "상세 설명이 없습니다."}</Text>
+            </View>
+          ) : (
+            <Text style={styles.infoText}>상품 정보를 찾을 수 없습니다.</Text>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  header: { padding: 20, backgroundColor: '#fff', alignItems: 'center', elevation: 2 },
+  headerText: { fontSize: 18, fontWeight: 'bold' },
+  content: { flexGrow: 1, padding: 20, justifyContent: 'center' },
+  emptyView: { alignItems: 'center' },
+  infoText: { fontSize: 16, color: '#666' },
+  productCard: { backgroundColor: '#fff', padding: 25, borderRadius: 15, elevation: 4 },
+  label: { fontSize: 12, color: '#007AFF', fontWeight: 'bold', marginBottom: 5 },
+  name: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  price: { fontSize: 20, color: '#e74c3c', fontWeight: 'bold', marginBottom: 20 },
+  line: { height: 1, backgroundColor: '#eee', marginBottom: 20 },
+  desc: { fontSize: 16, color: '#444', lineHeight: 24 }
+});
+
+export default App;

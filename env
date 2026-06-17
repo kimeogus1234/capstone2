@@ -1,0 +1,21 @@
+PORT=3000
+DB_HOST=db
+DB_NAME=capstone_db
+DB_USER=root
+DB_PASS=1234
+JWT_SECRET=supersecret
+ALLOWED_IPS=0.0.0.0/0
+MONGO_URI=mongodb+srv://ytv666666_db_user:5856HBuVvURCKLEr@cluster0.ed2xywd.mongodb.net/a00
+
+# 📧 Email Settings (For Verification)
+EMAIL_SERVICE=gmail
+EMAIL_USER=freshmildstore@gmail.com
+EMAIL_PASS=xohy ahsd zozw ilft
+
+# 🟢 Naver Login API
+NAVER_CLIENT_ID=O9VKTE4LjwjB3UXJ1JrS
+NAVER_CLIENT_SECRET=w0TpSyOGUQ
+GOOGLE_WEB_CLIENT_ID=273448273158-0d618m71i2t1683a9p88vn9vgqj2p7mb.apps.googleusercontent.com
+TOSS_SECRET_KEY=test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+KAKAO_REST_API_KEY=4ffac3375b2e583dc79b9e048d1c02d5
+KAKAO_CLIENT_SECRET=d0Mgkq4q9z0F4lg9zv0TMWJQHAFkrntf
